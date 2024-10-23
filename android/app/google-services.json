@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "742305620820",
+    "project_id": "zelix-empire",
+    "storage_bucket": "zelix-empire.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742305620820:android:7dd78eabb2f5a218eb1ec1",
+        "android_client_info": {
+          "package_name": "com.zelix.zelixempire"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAf1Cu9E4ovFROVxCWi9-7pb44ben58Nys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
