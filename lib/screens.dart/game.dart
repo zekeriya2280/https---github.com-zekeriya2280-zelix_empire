@@ -11,7 +11,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  Timer? _timer = null;
+  Timer? _timer;
 
 Function? startCountdown(Map<String, dynamic> material) {
    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
