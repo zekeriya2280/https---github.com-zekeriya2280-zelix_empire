@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:zelix_empire/firebase/fbcontroller.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -12,6 +13,18 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    Fbcontroller().addProductsToFirestore();
+    super.initState();
+  }
 
 Function? startCountdown(Map<String, dynamic> material) {
    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -82,7 +95,8 @@ void fetchProductionTime(String materialname) async {
             ),
           ),
           const SizedBox(height: 10),
-          Text('Price: \$${material['price']?.toString() ?? 'N/A'}'),
+          Text('BasePurchasePrice: \$${material['basePurchasePrice']?.toString() ?? 'N/A'}'),
+          Text('BaseSalePrice: \$${material['baseSalePrice']?.toString() ?? 'N/A'}'),
           Text('Time: ${material['production_time']?.toString() ?? 'N/A'}'),
           //Text(_remainingTime), // Display the remaining time
         ],

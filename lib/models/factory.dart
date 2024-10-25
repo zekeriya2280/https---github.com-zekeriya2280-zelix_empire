@@ -57,39 +57,39 @@ class Factory {
   }
 
   // Üretim yapma ve upkeep vergisi uygula
-  bool produceWithBuilding(Building building) {
-    double upkeepCost = building.currentUpkeep;
-    if (budget >= upkeepCost) {
-      budget -= upkeepCost;
-      print('Upkeep of \$${upkeepCost.toStringAsFixed(2)} paid for ${building.name}');
-
-      Product product = building.produces;
-      if (product.requiredMaterials != null) {
-        for (var material in product.requiredMaterials!.entries) {
-          if (stock[material.key] == null || stock[material.key]! < material.value) {
-            print('Not enough ${material.key} to produce ${product.name}');
-            return false;
-          }
-        }
-
-        for (var material in product.requiredMaterials!.entries) {
-          stock[material.key] = stock[material.key]! - material.value;
-        }
-
-        stock[product.name] = (stock[product.name] ?? 0) + 1;
-        print('${product.name} produced successfully by ${building.name}!');
-        return true;
-      } else {
-        stock[product.name] = (stock[product.name] ?? 0) + 1;
-        print('${product.name} produced successfully by ${building.name}!');
-        return true;
-      }
-    } else {
-      print('Not enough budget to cover upkeep for ${building.name}');
-      return false;
-    }
-  }
-
+// bool produceWithBuilding(Building building) {
+//   double upkeepCost = building.currentUpkeep;
+//   if (budget >= upkeepCost) {
+//     budget -= upkeepCost;
+//     print('Upkeep of \$${upkeepCost.toStringAsFixed(2)} paid for ${building.name}');
+//
+//     Product product = building.produces;
+//     if (product.requiredMaterials != null) {
+//       for (var material in product.requiredMaterials!.entries) {
+//         if (stock[material.key] == null || stock[material.key]! < material.value) {
+//           print('Not enough ${material.key} to produce ${product.name}');
+//           return false;
+//         }
+//       }
+//
+//       for (var material in product.requiredMaterials!.entries) {
+//         stock[material.key] = stock[material.key]! - material.value;
+//       }
+//
+//       stock[product.name] = (stock[product.name] ?? 0) + 1;
+//       print('${product.name} produced successfully by ${building.name}!');
+//       return true;
+//     } else {
+//       stock[product.name] = (stock[product.name] ?? 0) + 1;
+//       print('${product.name} produced successfully by ${building.name}!');
+//       return true;
+//     }
+//   } else {
+//     print('Not enough budget to cover upkeep for ${building.name}');
+//     return false;
+//   }
+// }
+//
   // Bina seviyesini artırma
   void levelUpBuilding(Building building) {
     building.levelUp();
