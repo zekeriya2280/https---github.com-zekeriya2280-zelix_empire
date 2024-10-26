@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:zelix_empire/firebase/fbcontroller.dart';
+import 'package:zelix_empire/models/product.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -63,7 +64,7 @@ void fetchProductionTime(String materialname) async {
           }
 
           // Eğer veri başarılı bir şekilde gelmişse, bir GridView'da gösteriyoruz.
-          final materials = snapshot.data!.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+          final List<Map<String, dynamic>> materials = snapshot.data!.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
 
           return GridView.builder(
             padding: const EdgeInsets.all(10),
@@ -75,12 +76,12 @@ void fetchProductionTime(String materialname) async {
             ),
             itemCount: materials.length,
             itemBuilder: (context, index) {
-              final material = materials[index];
+              Product material = Product.fromMap(materials[index]);
               return Card(
   elevation: 5,
   child: InkWell(
     onTap: () {
-      startCountdown(material);
+      startCountdown(material.toMap());
     },
     child: Padding(
       padding: const EdgeInsets.all(8.0),
@@ -88,17 +89,18 @@ void fetchProductionTime(String materialname) async {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            material['name'] ?? 'Unknown',
+            material.name ?? 'Unknown',
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
           const SizedBox(height: 10),
-          Text('BasePurchasePrice: \$${material['basePurchasePrice']?.toString() ?? 'N/A'}'),
-          Text('BaseSalePrice: \$${material['baseSalePrice']?.toString() ?? 'N/A'}'),
-          Text('Time: ${material['production_time']?.toString() ?? 'N/A'}'),
-          //Text(_remainingTime), // Display the remaining time
+          Text('Base Purchase Price: \$${material.basePurchasePrice.toString() ?? 1.0}'),
+          Text('Base Sale Price: \$${material.baseSalePrice.toString() ?? 1.0}'),
+          Text('Duration: ${material.duration.toString() ?? 1}'),
+          Text('Inflation: ${material.inflation.toString() ?? 1.0}'),
+          Text('Required Materials: ${material.requiredMaterials.toString() ?? []}'),
         ],
       ),
     ),
