@@ -23,7 +23,7 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   void initState() {
-    Fbcontroller().addProductsToFirestore();
+    
     super.initState();
   }
 
@@ -37,15 +37,15 @@ Function? startCountdown(Map<String, dynamic> material) {
 void fetchProductionTime(String materialname) async {
   String currentid = '1';
   int productionTime = 0;
-  QuerySnapshot<Map<String, dynamic>> documentSnapshot = await FirebaseFirestore.instance.collection('materials').get();
+  QuerySnapshot<Map<String, dynamic>> documentSnapshot = await FirebaseFirestore.instance.collection('products').get();
     for (var doc in documentSnapshot.docs) {
       if(doc.data()['name'] == materialname){
          currentid = doc.id;
-         productionTime = int.parse(doc.data()['production_time'].toString());
+         productionTime = int.parse(doc.data()['duration'].toString());
       } 
     }
   productionTime >= 0 ? productionTime -= 1 : true;
-  productionTime >= 0 ? await FirebaseFirestore.instance.collection('materials').doc(currentid).update({'production_time': productionTime.toString()}) : true;
+  productionTime >= 0 ? await FirebaseFirestore.instance.collection('products').doc(currentid).update({'duration': productionTime.toString()}) : true;
 }
 
   @override
@@ -53,7 +53,7 @@ void fetchProductionTime(String materialname) async {
     return Scaffold(
       appBar: AppBar(title: const Text('Game')),
       body: StreamBuilder<QuerySnapshot<Object?>>(
-        stream: FirebaseFirestore.instance.collection('materials').snapshots(),
+        stream: FirebaseFirestore.instance.collection('products').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -96,6 +96,7 @@ void fetchProductionTime(String materialname) async {
             ),
           ),
           const SizedBox(height: 10),
+          Text('Level: \$${material.level.toString() ?? 1}'),
           Text('Base Purchase Price: \$${material.basePurchasePrice.toString() ?? 1.0}'),
           Text('Base Sale Price: \$${material.baseSalePrice.toString() ?? 1.0}'),
           Text('Duration: ${material.duration.toString() ?? 1}'),

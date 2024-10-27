@@ -42,7 +42,7 @@ class Country {
   Map<Product, int> getNewProductRequirements() {
     // Her seviye için yeni ürün talepleri tanımlanabilir
     return {
-      Product(name: 'Advanced Product', basePurchasePrice: 200, baseSalePrice: 300, duration: 5): 10,
+      Product(name: 'Advanced Product', basePurchasePrice: 200, baseSalePrice: 300, duration: 5, level: level): 10,
     };
   }
 }

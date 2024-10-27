@@ -3,11 +3,14 @@ class Product {
   double basePurchasePrice; // Ürünün temel alış fiyatı
   double baseSalePrice; // Ürünün temel satış fiyatı
   final int duration; // Ürünün üretim süresi
-  final List<Map<String, int>>? requiredMaterials; // Ürünün üretimi için gereken hammaddeler
-  double inflation; // Ürünün enflasyon oranı
+  final List<String>? requiredMaterials; // Ürünün üretimi için gereken hammaddeler
+  double inflation;
+  int level;
+  
 
   Product({
     required this.name,
+    required this.level,
     required this.basePurchasePrice,
     required this.baseSalePrice,
     required this.duration,
@@ -24,11 +27,12 @@ class Product {
   static Product fromMap(Map<String, dynamic> material) {
     return Product(
       name: material['name'],
-      basePurchasePrice: double.parse(material['basePurchasePrice']),
-      baseSalePrice: double.parse(material['baseSalePrice']),
-      duration: int.parse(material['duration']),
-      requiredMaterials: List<Map<String, int>>.from(material['rinflation']),
-      inflation: double.parse(material['requaredMaterials']),
+      basePurchasePrice: double.parse(material['basePurchasePrice'].toString()),
+      baseSalePrice: double.parse(material['salePurchasePrice'].toString()),
+      duration: int.parse(material['duration'].toString()),
+      requiredMaterials: List<String>.from(material['requiredMaterials']),
+      inflation: double.parse(material['inflation'].toString()), 
+      level: int.parse(material['level'].toString()),
     );
   }
 
