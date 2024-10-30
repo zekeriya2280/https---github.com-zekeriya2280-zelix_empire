@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Fbcontroller {
-  Future<void> addProductsToFirestore() async {
+  Future<void> addProductsToFirestore() async { //DEV. RESET--------------------------
     // Firestore instance
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -1012,18 +1012,38 @@ class Fbcontroller {
     WriteBatch batch = firestore.batch();
 
     // Her bir ürünü "products" koleksiyonuna ekliyoruz
-   // for (Map<String, dynamic> product in products) {
-      await firestore.collection('products').get().then((QuerySnapshot<Map<String, dynamic>> querySnapshot) {
-        List<Map<String, dynamic>> allproducts = querySnapshot.docs.map((doc) => doc.data()).toList();
-        allproducts.toSet();
-        
-      });
+   for (Map<String, dynamic> product in products) {
+    batch.set(firestore.collection('products').doc(), product);
+   }
+    try {
+      await batch.commit();
+      print('Ürünler başarıyla Firestore\'a eklendi.');
+    } catch (e) {
+      print('Ürünler eklenirken hata oluştu: $e');
     }
-  //  try {
-  //    await batch.commit();
-  //    print('Ürünler başarıyla Firestore\'a eklendi.');
-  //  } catch (e) {
-  //    print('Ürünler eklenirken hata oluştu: $e');
-  //  }
- // }
+  
+  }
+  /// Deletes repeated products from the Firestore 'products' collection.
+  /// This function iterates over all documents in the collection and
+  /// removes any duplicates based on the 'name' field.
+  Future<void> deleteRepeatedProducts() async { //DEV. RESET--------------------------
+    try {
+      final Set<String> uniqueNames = {}; // set to store unique product names
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection('products').get();
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+        if (doc.exists && doc.data().containsKey('name')) {
+          final String name = doc['name'] as String;
+          if (!uniqueNames.add(name)) {
+            // if the product name is already in the set, it means it's a duplicate
+            await FirebaseFirestore.instance.collection('products').doc(doc.id).delete();
+          }
+        }
+      }
+    } on FirebaseException catch (e) {
+      print('Ürünler silinirken hata oluştu: $e');
+    } catch (e) {
+      print('Ürünler silinirken bilinmeyen hata oluştu: $e');
+    }
+  }
 }

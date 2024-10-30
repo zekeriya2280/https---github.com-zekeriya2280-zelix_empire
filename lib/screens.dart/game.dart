@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:zelix_empire/firebase/fbcontroller.dart';
 import 'package:zelix_empire/models/product.dart';
 
 class GameScreen extends StatefulWidget {
@@ -89,7 +88,7 @@ void fetchProductionTime(String materialname) async {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            material.name ?? 'Unknown',
+            material.name,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,

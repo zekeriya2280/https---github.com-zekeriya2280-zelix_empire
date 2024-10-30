@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zelix_empire/firebase/fbcontroller.dart';
+//import 'package:zelix_empire/firebase/fbcontroller.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -11,7 +11,8 @@ class IntroScreen extends StatefulWidget {
 class _IntroScreenState extends State<IntroScreen> {
   @override
   void initState() {
-    Fbcontroller().addProductsToFirestore();
+    // DEV. RESET ----- Fbcontroller().addProductsToFirestore();
+    // DEV. RESET ----- Fbcontroller().deleteRepeatedProducts();
     super.initState();
   }
   @override
