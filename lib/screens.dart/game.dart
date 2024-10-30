@@ -111,6 +111,7 @@ class _GameScreenState extends State<GameScreen> {
             itemCount: materials.length,
             itemBuilder: (context, index) {
               materials.sort((a, b) => a['level'].compareTo(b['level']));
+              materials.sort((a, b) => a['purchasePrice'].compareTo(b['purchasePrice']));
               Product material = Product.fromMap(materials[index]);
               return Card(
                 elevation: 5,

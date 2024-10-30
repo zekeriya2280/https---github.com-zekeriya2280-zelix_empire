@@ -1092,17 +1092,23 @@ class Fbcontroller {
   }
   }
   Future<int> findUserMoney() async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get()
-        .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
-          if (documentSnapshot.exists) {
-            return int.parse(documentSnapshot.data()!['money'].toString());
-          } else {
-            return 0;
-          }
-        });
-    return 0;
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .get(const GetOptions(source: Source.cache));
+      if (documentSnapshot.exists) {
+        return documentSnapshot.data()!['money'] as int;
+      } else {
+        return 0;
+      }
+    } on FirebaseException catch (e) {
+      print('Error fetching user money: $e');
+      return 0;
+    } on Exception catch (e) {
+      print('An unexpected error occurred while fetching user money: $e');
+      return 0;
+    }
   }
 }
