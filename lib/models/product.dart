@@ -4,7 +4,7 @@ class Product {
   double baseSalePrice; // Ürünün temel satış fiyatı
   final int duration; // Ürünün üretim süresi
   final List<String>? requiredMaterials; // Ürünün üretimi için gereken hammaddeler
-  double inflation;
+  double demandindex;
   int level;
   
 
@@ -15,14 +15,14 @@ class Product {
     required this.baseSalePrice,
     required this.duration,
     this.requiredMaterials,
-    this.inflation = 0.02, // Varsayılan enflasyon oranı %2
+    this.demandindex = 0.02, // Varsayılan enflasyon oranı %2
   });
 
   // Enflasyona göre alış fiyatını güncelle
-  double get currentPurchasePrice => basePurchasePrice * (1 + inflation);
+  double get currentPurchasePrice => basePurchasePrice * (1 + demandindex);
 
   // Enflasyona göre satış fiyatını güncelle
-  double get currentSalePrice => baseSalePrice * (1 + inflation);
+  double get currentSalePrice => baseSalePrice * (1 + demandindex);
 
   static Product fromMap(Map<String, dynamic> material) {
     return Product(
@@ -31,7 +31,7 @@ class Product {
       baseSalePrice: double.parse(material['salePurchasePrice'].toString()),
       duration: int.parse(material['duration'].toString()),
       requiredMaterials: List<String>.from(material['requiredMaterials']),
-      inflation: double.parse(material['inflation'].toString()), 
+      demandindex: double.parse(material['demandindex'].toString()), 
       level: int.parse(material['level'].toString()),
     );
   }
@@ -43,7 +43,7 @@ class Product {
       'base_sale_price': baseSalePrice,
       'duration': duration,
       'required_materials': requiredMaterials,
-      'inflation': inflation,
+      'demandindex': demandindex,
     };
   }
 }

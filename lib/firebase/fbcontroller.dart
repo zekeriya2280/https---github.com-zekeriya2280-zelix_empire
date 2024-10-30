@@ -1046,4 +1046,25 @@ class Fbcontroller {
       print('Ürünler silinirken bilinmeyen hata oluştu: $e');
     }
   }
+  Future<void> firebaseChangeWordsInCollections(String collectionPath, String oldWord, String newWord) async {
+    try {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection(collectionPath).get();
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+        if (doc.exists) {
+          final Map<String, dynamic> data = <String, dynamic>{};
+          if (doc.data().containsKey(oldWord)) {
+            data[oldWord] = FieldValue.delete();
+          }
+          data[newWord] = 0;
+          await doc.reference.update(data);
+        }
+      }
+    } on FirebaseException catch (e) {
+      print('Ürünler güncellenirken hata oluştu: $e');
+    } on Exception catch (e) {
+      print('Ürünler güncellenirken bilinmeyen hata oluştu: $e');
+    }
+  }
+
 }

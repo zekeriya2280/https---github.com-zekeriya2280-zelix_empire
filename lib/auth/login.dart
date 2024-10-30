@@ -2,31 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:zelix_empire/auth/signup.dart';
 import 'package:zelix_empire/screens.dart/intro.dart';
+import 'dart:developer' as developer;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> login() async {
     try {
-      await _auth.signInWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const IntroScreen()),
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
       );
-    } catch (e) {
-      print(e); // Hata işlemi
+      if (userCredential.user == null) {
+        developer.log('Error logging in: User is null', name: 'LoginScreen');
+        return;
+      }
+      if (mounted) {
+        await Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const IntroScreen()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No user found for that email.')),
+          );
+        }
+      } else if (e.code == 'wrong-password') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Wrong password provided for that user.')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('An unknown error occurred: $e')),
+          );
+        }
+      }
+    } on Exception catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An unknown error occurred: $e')),
+        );
+      }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

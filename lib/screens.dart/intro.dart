@@ -13,6 +13,7 @@ class _IntroScreenState extends State<IntroScreen> {
   void initState() {
     // DEV. RESET ----- Fbcontroller().addProductsToFirestore();
     // DEV. RESET ----- Fbcontroller().deleteRepeatedProducts();
+    // DEV. RESET ----- Fbcontroller().firebaseChangeWordsInCollections('products', 'inflation', 'demandindex');
     super.initState();
   }
   @override
