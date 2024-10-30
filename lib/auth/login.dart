@@ -130,7 +130,7 @@ class LoginScreenState extends State<LoginScreen> {
                       MaterialPageRoute(builder: (context) => const SignUpScreen()),
                     );
                   },
-                  child: const Text("Don't have an account? Sign Up", style: TextStyle(color: Colors.white)),
+                  child: const Text("Don't have an account?     Sign Up", style: TextStyle(color: Colors.orange,fontSize: 18, fontWeight: FontWeight.bold),),
                 ),
               ],
             ),

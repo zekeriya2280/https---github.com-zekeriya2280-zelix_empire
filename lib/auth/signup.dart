@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:zelix_empire/firebase/fbcontroller.dart';
+import 'package:zelix_empire/models/building.dart';
+import 'package:zelix_empire/models/product.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -10,35 +13,60 @@ class SignUpScreen extends StatefulWidget {
 
 class SignUpScreenState extends State<SignUpScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController nicknameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> signUp() async {
     try {
       if (emailController.text.isNotEmpty &&
-          passwordController.text.isNotEmpty) {
-        await _auth.createUserWithEmailAndPassword(
-            email: emailController.text, password: passwordController.text);
-        Navigator.pushNamed(context, '/intro');
+          passwordController.text.isNotEmpty &&
+          nicknameController.text.isNotEmpty) {
+        await _auth
+            .createUserWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text)
+            .then((UserCredential result) async {
+          final user = result.user;
+          if (user != null) {
+            await user.updateDisplayName(nicknameController.text);
+            await Fbcontroller().signUpToFirebaseUsers(
+                user.uid, nicknameController.text, emailController.text, <Building>[], <Product>[]);
+            if (mounted) {
+              Navigator.pushNamed(context, '/intro');
+            }
+          } else {
+            throw Exception('Failed to create user.');
+          }
+        });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("E-mail ve  leti men giriniz."),
-        ));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("E-mail ve sifrenizi kontrol ediniz."),
+          ));
+        }
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(" leti men zay f."),
-        ));
-      } else if (e.code == 'email-already-in-use') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Bu e-mail adresi kullan m d ."),
-        ));
+      if (mounted) {
+        if (e.code == 'weak-password') {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("sifre zayıf"),
+          ));
+        } else if (e.code == 'email-already-in-use') {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Bu e-mail adresi kullanımda."),
+          ));
+        }
       }
     } catch (e) {
-      print(e); // Hata i lemi
+      print('An unexpected error occurred: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Bir hata oluştu."),
+        ));
+      }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +78,34 @@ class SignUpScreenState extends State<SignUpScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
+              controller: nicknameController,
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.white,
+              decoration: InputDecoration(
+                labelText: 'Nickname',
+                hintText: 'Enter your nickname',
+                hintStyle: const TextStyle(color: Color.fromARGB(146, 255, 255, 255)),
+                labelStyle: const TextStyle(color: Colors.white),
+                prefixIcon: const Icon(Icons.person, color: Colors.white),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.white,
               controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
+                hintText: 'Enter your email',
+                hintStyle: const TextStyle(color: Color.fromARGB(146, 255, 255, 255)),
                 labelStyle: const TextStyle(color: Colors.white),
                 prefixIcon: const Icon(Icons.email, color: Colors.white),
                 enabledBorder: OutlineInputBorder(
@@ -67,10 +120,14 @@ class SignUpScreenState extends State<SignUpScreen> {
             ),
             const SizedBox(height: 15),
             TextField(
+              cursorColor: Colors.white,
               controller: passwordController,
+              style: const TextStyle(color: Colors.white),
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
+                hintText: 'Enter your password',
+                hintStyle: const TextStyle(color: Color.fromARGB(146, 255, 255, 255)),
                 labelStyle: const TextStyle(color: Colors.white),
                 prefixIcon: const Icon(Icons.lock, color: Colors.white),
                 enabledBorder: OutlineInputBorder(

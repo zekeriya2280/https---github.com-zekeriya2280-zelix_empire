@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:zelix_empire/models/building.dart';
+import 'package:zelix_empire/models/product.dart';
 
 class Fbcontroller {
   Future<void> addProductsToFirestore() async { //DEV. RESET--------------------------
@@ -1046,7 +1048,7 @@ class Fbcontroller {
       print('Ürünler silinirken bilinmeyen hata oluştu: $e');
     }
   }
-  Future<void> firebaseChangeWordsInCollections(String collectionPath, String oldWord, String newWord) async {
+  Future<void> firebaseChangeWordsInCollections(String collectionPath, String oldWord, String newWord) async { //DEV. RESET--------------------------
     try {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance.collection(collectionPath).get();
@@ -1066,5 +1068,29 @@ class Fbcontroller {
       print('Ürünler güncellenirken bilinmeyen hata oluştu: $e');
     }
   }
+  Future<void> signUpToFirebaseUsers(String id, String nickname, String email, List<Building> buildings, List<Product> products) async {
+  if (id.isEmpty || nickname.isEmpty || email.isEmpty) {
+    print('Invalid input: all fields must be non-empty.');
+    return;
+  }
+  try {
+    await FirebaseFirestore.instance.collection('users').doc(id).set({
+      'id': id,
+      'nickname': nickname,
+      'email': email,
+      'buildings': buildings,
+      'products': products
+    });
+    print('User successfully created.');
+  } on FirebaseException catch (e) {
+    if (e.code == 'permission-denied') {
+      print('Permission denied: $e');
+    } else {
+      print('Error creating user: $e');
+    }
+  } catch (e) {
+    print('An unexpected error occurred: $e');
+  }
+}
 
 }
