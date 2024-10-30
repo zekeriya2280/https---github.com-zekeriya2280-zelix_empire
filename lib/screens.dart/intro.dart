@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:zelix_empire/auth/signup.dart';
 //import 'package:zelix_empire/firebase/fbcontroller.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -9,6 +11,7 @@ class IntroScreen extends StatefulWidget {
 }
 
 class _IntroScreenState extends State<IntroScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   void initState() {
     // DEV. RESET ----- Fbcontroller().addProductsToFirestore();
@@ -19,7 +22,23 @@ class _IntroScreenState extends State<IntroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Intro')),
+      appBar: AppBar(
+            backgroundColor: const Color(0xFF0D47A1), // Mavi arka plan
+            title: const Text('ZELIX EMPIRE', style: TextStyle(color: Colors.white, fontSize: 25, fontStyle: FontStyle.italic,letterSpacing: 5, fontWeight: FontWeight.bold)),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout, color: Colors.white),
+                onPressed: () {
+                  _auth.signOut();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

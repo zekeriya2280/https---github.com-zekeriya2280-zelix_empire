@@ -5,21 +5,38 @@ class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  SignUpScreenState createState() => SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class SignUpScreenState extends State<SignUpScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> signUp() async {
     try {
-      await _auth.createUserWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
-      //Navigator.pop(context);
+      if (emailController.text.isNotEmpty &&
+          passwordController.text.isNotEmpty) {
+        await _auth.createUserWithEmailAndPassword(
+            email: emailController.text, password: passwordController.text);
+        Navigator.pushNamed(context, '/intro');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("E-mail ve  leti men giriniz."),
+        ));
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(" leti men zay f."),
+        ));
+      } else if (e.code == 'email-already-in-use') {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Bu e-mail adresi kullan m d ."),
+        ));
+      }
     } catch (e) {
-      print(e); // Hata işlemi
+      print(e); // Hata i lemi
     }
   }
 

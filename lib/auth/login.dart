@@ -72,6 +72,7 @@ class LoginScreenState extends State<LoginScreen> {
         }
         return Scaffold(
           backgroundColor: const Color(0xFF0D47A1), // Mavi arka plan
+          
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

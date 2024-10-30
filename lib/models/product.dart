@@ -24,11 +24,11 @@ class Product {
   // Enflasyona göre satış fiyatını güncelle
   double get currentSalePrice => baseSalePrice * (1 + demandindex);
 
-  static Product fromMap(Map<String, dynamic> material) {
+  factory Product.fromMap(Map<String, dynamic> material) {
     return Product(
       name: material['name'],
-      basePurchasePrice: double.parse(material['basePurchasePrice'].toString()),
-      baseSalePrice: double.parse(material['salePurchasePrice'].toString()),
+      basePurchasePrice: double.parse(material['purchasePrice'].toString()),
+      baseSalePrice: double.parse(material['salePrice'].toString()),
       duration: int.parse(material['duration'].toString()),
       requiredMaterials: List<String>.from(material['requiredMaterials']),
       demandindex: double.parse(material['demandindex'].toString()), 
