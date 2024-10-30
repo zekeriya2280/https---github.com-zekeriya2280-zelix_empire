@@ -1069,25 +1069,22 @@ class Fbcontroller {
     }
   }
   Future<void> signUpToFirebaseUsers(String id, String nickname, String email, List<Building> buildings, List<Product> products) async {
-  if (id.isEmpty || nickname.isEmpty || email.isEmpty) {
+  if ([id, nickname, email].any((element) => element.isEmpty)) {
     print('Invalid input: all fields must be non-empty.');
     return;
   }
   try {
-    await FirebaseFirestore.instance.collection('users').doc(id).set({
+    final userData = {
       'id': id,
       'nickname': nickname,
       'email': email,
       'buildings': buildings,
       'products': products
-    });
+    };
+    await FirebaseFirestore.instance.collection('users').doc(id).set(userData);
     print('User successfully created.');
   } on FirebaseException catch (e) {
-    if (e.code == 'permission-denied') {
-      print('Permission denied: $e');
-    } else {
-      print('Error creating user: $e');
-    }
+    print(e.code == 'permission-denied' ? 'Permission denied: $e' : 'Error creating user: $e');
   } catch (e) {
     print('An unexpected error occurred: $e');
   }
