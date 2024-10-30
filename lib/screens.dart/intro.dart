@@ -45,19 +45,19 @@ class _IntroScreenState extends State<IntroScreen> {
           children: [
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/game');
+                Navigator.pushNamedAndRemoveUntil(context, '/game', (route) => false);
               },
               child: const Text('Game'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/how-to-play');
+                Navigator.pushNamedAndRemoveUntil(context, '/howtoplay', (route) => false);
               },
               child: const Text('How to Play'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/options');
+                Navigator.pushNamedAndRemoveUntil(context, '/options', (route) => false);
               },
               child: const Text('Options'),
             ),

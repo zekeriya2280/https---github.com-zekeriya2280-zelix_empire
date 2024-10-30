@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:zelix_empire/firebase/fbcontroller.dart';
 import 'package:zelix_empire/models/product.dart';
 
 class GameScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   Timer? _timer;
+  int usermoney = 0;
 
   @override
   void dispose() {
@@ -22,17 +24,24 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   void initState() {
+    findusermoney();
     super.initState();
   }
 
-  Function? startCountdown(Map<String, dynamic> material) {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      fetchProductionTime(material['name']);
+  Future<void> findusermoney() async {
+    await Fbcontroller().findUserMoney().then((value) {
+      setState(() {
+        usermoney = value;
+      });
     });
-    return null;
+  }
+  void startCountdown(Map<String, dynamic> material) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async{
+      await fetchProductionTime(material['name']);
+    });
   }
 
-  void fetchProductionTime(String materialname) async {
+  Future<void> fetchProductionTime(String materialname) async {
     String currentid = '1';
     int productionTime = 0;
     QuerySnapshot<Map<String, dynamic>> documentSnapshot =
@@ -55,14 +64,32 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Game')),
+      appBar: AppBar(
+  backgroundColor: Color.fromARGB(255, 0, 191, 255), // beautiful blue color
+  elevation: 0,
+  leading: null, // remove back button
+  title: Row(
+    children: [
+      Text(
+        '\$${usermoney.toString()}',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    ],
+  ),
+),
       body: StreamBuilder<QuerySnapshot<Object?>>(
         stream: FirebaseFirestore.instance.collection('products').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
+          if (!snapshot.hasData) {
+            return const SizedBox(); // or return a loading indicator
+          }
           if (snapshot.hasError) {
             return const Center(child: Text('Error fetching materials'));
           }
@@ -83,6 +110,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
             itemCount: materials.length,
             itemBuilder: (context, index) {
+              materials.sort((a, b) => a['level'].compareTo(b['level']));
               Product material = Product.fromMap(materials[index]);
               return Card(
                 elevation: 5,

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:zelix_empire/models/building.dart';
 import 'package:zelix_empire/models/product.dart';
 
@@ -1078,6 +1079,7 @@ class Fbcontroller {
       'id': id,
       'nickname': nickname,
       'email': email,
+      'money': 1000, 
       'buildings': buildings,
       'products': products
     };
@@ -1088,6 +1090,19 @@ class Fbcontroller {
   } catch (e) {
     print('An unexpected error occurred: $e');
   }
-}
-
+  }
+  Future<int> findUserMoney() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get()
+        .then((DocumentSnapshot<Map<String, dynamic>> documentSnapshot) {
+          if (documentSnapshot.exists) {
+            return int.parse(documentSnapshot.data()!['money'].toString());
+          } else {
+            return 0;
+          }
+        });
+    return 0;
+  }
 }
