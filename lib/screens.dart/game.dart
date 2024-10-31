@@ -15,7 +15,8 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   Timer? _timer;
   int usermoney = 0;
-
+  bool canbebought = false;
+  String selecteditem = 'Water';
   @override
   void dispose() {
     _timer?.cancel();
@@ -59,6 +60,13 @@ class _GameScreenState extends State<GameScreen> {
             .doc(currentid)
             .update({'duration': productionTime.toString()})
         : true;
+  }
+  Future<void> updateSelectedItem(String item) async {
+    //setState(() {
+      selecteditem = item;
+    //});
+    await Fbcontroller().canBeProducedByCheckingRequiredMaterials(selecteditem).then((value) => canbebought = value);
+    
   }
 
   @override
@@ -111,13 +119,15 @@ class _GameScreenState extends State<GameScreen> {
             itemCount: materials.length,
             itemBuilder: (context, index) {
               materials.sort((a, b) => a['level'].compareTo(b['level']));
-              materials.sort((a, b) => a['purchasePrice'].compareTo(b['purchasePrice']));
               Product material = Product.fromMap(materials[index]);
+              
               return Card(
+                color: !canbebought ? Colors.redAccent : const Color.fromARGB(255, 255, 255, 255),
                 elevation: 5,
                 child: InkWell(
                   onTap: () {
-                    startCountdown(material.toMap());
+                    updateSelectedItem(material.name);
+                    canbebought ? startCountdown(material.toMap()) : true;
                   },
                   child: SizedBox(
                     height: 4000,
@@ -178,7 +188,9 @@ class _GameScreenState extends State<GameScreen> {
                             textAlign: TextAlign.center,
                           ),
                           Text(
-                            'Required Materials: ${material.requiredMaterials.toString()}',
+                            'Required Materials: \n ${
+                              material.requiredMaterials!.isEmpty ? 'None' :
+                              material.requiredMaterials.toString().substring(2,material.requiredMaterials.toString().length-2).split('}').join(' ').split('{').join(' ')}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,

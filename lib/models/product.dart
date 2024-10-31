@@ -3,7 +3,7 @@ class Product {
   double basePurchasePrice; // Ürünün temel alış fiyatı
   double baseSalePrice; // Ürünün temel satış fiyatı
   final int duration; // Ürünün üretim süresi
-  final List<String>? requiredMaterials; // Ürünün üretimi için gereken hammaddeler
+  List<Map<String, dynamic>>? requiredMaterials; // Ürünün üretimi için gereken hammaddeler
   double demandindex;
   int level;
   
@@ -14,7 +14,7 @@ class Product {
     required this.basePurchasePrice,
     required this.baseSalePrice,
     required this.duration,
-    this.requiredMaterials,
+    required this.requiredMaterials,
     this.demandindex = 0.02, // Varsayılan enflasyon oranı %2
   });
 
@@ -30,7 +30,7 @@ class Product {
       basePurchasePrice: double.parse(material['purchasePrice'].toString()),
       baseSalePrice: double.parse(material['salePrice'].toString()),
       duration: int.parse(material['duration'].toString()),
-      requiredMaterials: List<String>.from(material['requiredMaterials']),
+      requiredMaterials: List<Map<String, dynamic>>.from(material['requiredMaterials']),
       demandindex: double.parse(material['demandindex'].toString()), 
       level: int.parse(material['level'].toString()),
     );

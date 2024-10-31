@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:zelix_empire/auth/signup.dart';
+import 'package:zelix_empire/firebase/fbcontroller.dart';
 //import 'package:zelix_empire/firebase/fbcontroller.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -16,7 +17,8 @@ class _IntroScreenState extends State<IntroScreen> {
   void initState() {
     // DEV. RESET ----- Fbcontroller().addProductsToFirestore();
     // DEV. RESET ----- Fbcontroller().deleteRepeatedProducts();
-    // DEV. RESET ----- Fbcontroller().firebaseChangeWordsInCollections('products', 'inflation', 'demandindex');
+    // DEV. RESET ----- Fbcontroller().firebaseChangeWordsInCollections('products', 'inflation', 'demandindex', <String, int>{});
+    // DEV. RESET ----- Fbcontroller().updateRequredMaterialsAsMap();
     super.initState();
   }
   @override

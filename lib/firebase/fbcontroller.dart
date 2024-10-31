@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:zelix_empire/models/building.dart';
 import 'package:zelix_empire/models/product.dart';
 
@@ -1049,7 +1050,7 @@ class Fbcontroller {
       print('Ürünler silinirken bilinmeyen hata oluştu: $e');
     }
   }
-  Future<void> firebaseChangeWordsInCollections(String collectionPath, String oldWord, String newWord) async { //DEV. RESET--------------------------
+  Future<void> firebaseChangeWordsInCollections(String collectionPath, String oldWord, String newWord ,dynamic value) async { //DEV. RESET--------------------------
     try {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance.collection(collectionPath).get();
@@ -1059,7 +1060,7 @@ class Fbcontroller {
           if (doc.data().containsKey(oldWord)) {
             data[oldWord] = FieldValue.delete();
           }
-          data[newWord] = 0;
+          data[newWord] = value;
           await doc.reference.update(data);
         }
       }
@@ -1069,7 +1070,7 @@ class Fbcontroller {
       print('Ürünler güncellenirken bilinmeyen hata oluştu: $e');
     }
   }
-  Future<void> signUpToFirebaseUsers(String id, String nickname, String email, List<Building> buildings, List<Product> products) async {
+  Future<void> signUpToFirebaseUsers(String id, String nickname, String email, Map<Building,int> buildings, Map<Product,int> products) async {
   if ([id, nickname, email].any((element) => element.isEmpty)) {
     print('Invalid input: all fields must be non-empty.');
     return;
@@ -1097,9 +1098,10 @@ class Fbcontroller {
           await FirebaseFirestore.instance
               .collection('users')
               .doc(FirebaseAuth.instance.currentUser!.uid)
-              .get(const GetOptions(source: Source.cache));
+              .get();
       if (documentSnapshot.exists) {
-        return documentSnapshot.data()!['money'] as int;
+        print('User money: ${documentSnapshot.data()!['money']}');
+        return documentSnapshot.data()!['money'];
       } else {
         return 0;
       }
@@ -1109,6 +1111,51 @@ class Fbcontroller {
     } on Exception catch (e) {
       print('An unexpected error occurred while fetching user money: $e');
       return 0;
+    }
+  }
+  Future<void> updateRequredMaterialsAsMap() async {
+    await FirebaseFirestore.instance
+        .collection('products')
+        .get()
+        .then((QuerySnapshot<Map<String, dynamic>> snapshot) {
+          for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+            if (doc.data().containsKey('requiredMaterials')) {
+              List<Map<String, dynamic>> requiredMaterials = [];
+              for (Map<String, dynamic> requiredMaterial in doc.data()['requiredMaterials']) {
+                requiredMaterials.add(requiredMaterial);
+              }
+              doc.reference.update({'requiredMaterials': requiredMaterials.map((e) => {e: "2"}).toList()});
+            }
+          }
+        });
+  }
+  Future<bool> canBeProducedByCheckingRequiredMaterials(String name) async {
+    print(name);
+    try {
+      QuerySnapshot<Map<String, dynamic>> productsnapshot = await FirebaseFirestore.instance.collection('products').get().then(
+          (QuerySnapshot<Map<String, dynamic>> snapshot) => snapshot);
+      if (productsnapshot.docs.isNotEmpty) {
+        for (var doc in productsnapshot.docs) {
+          if (doc.data()['name'] == name) {
+             for (Map<String, dynamic> requiredMaterial in doc.data()['requiredMaterials']) {
+               await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get().then((value) {
+                 if (value.data()!['products'].keys.contains(requiredMaterial['name']) && value.data()!['products'][requiredMaterial['name']] >= doc.data()['requiredMaterials'][requiredMaterial['name']]) {
+                   return true;
+                 }
+               });
+             }
+          }
+        }
+        return false;
+      } else {
+        return false;
+      }
+    } on FirebaseException catch (e) {
+      print('Error checking if product can be produced: $e');
+      return false;
+    } on Exception catch (e) {
+      print('An unexpected error occurred while checking if product can be produced: $e');
+      return false;
     }
   }
 }
