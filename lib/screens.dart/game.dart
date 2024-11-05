@@ -125,8 +125,9 @@ class _GameScreenState extends State<GameScreen> {
                 color: !canbebought ? Colors.redAccent : const Color.fromARGB(255, 255, 255, 255),
                 elevation: 5,
                 child: InkWell(
-                  onTap: () {
-                    updateSelectedItem(material.name);
+                  onTap: () async
+                    {
+                    await updateSelectedItem(material.name);
                     canbebought ? startCountdown(material.toMap()) : true;
                   },
                   child: SizedBox(

@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:zelix_empire/auth/signup.dart';
-import 'package:zelix_empire/firebase/fbcontroller.dart';
 //import 'package:zelix_empire/firebase/fbcontroller.dart';
 
 class IntroScreen extends StatefulWidget {
