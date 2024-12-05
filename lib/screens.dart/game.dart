@@ -43,30 +43,41 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> fetchProductionTime(String materialname) async {
-    String currentid = '1';
-    int productionTime = 0;
-    QuerySnapshot<Map<String, dynamic>> documentSnapshot =
-        await FirebaseFirestore.instance.collection('products').get();
-    for (var doc in documentSnapshot.docs) {
-      if (doc.data()['name'] == materialname) {
-        currentid = doc.id;
-        productionTime = int.parse(doc.data()['duration'].toString());
-      }
+  String currentid = '1';
+  int productionTime = 0;
+  QuerySnapshot<Map<String, dynamic>> documentSnapshot =
+      await FirebaseFirestore.instance.collection('products').get();
+  for (var doc in documentSnapshot.docs) {
+    if (doc.data()['name'] == materialname) {
+      currentid = doc.id;
+      productionTime = int.tryParse(doc.data()['duration'].toString()) ?? 0;
+      break;
     }
-    productionTime >= 0 ? productionTime -= 1 : true;
-    productionTime >= 0
-        ? await FirebaseFirestore.instance
-            .collection('products')
-            .doc(currentid)
-            .update({'duration': productionTime.toString()})
-        : true;
   }
+  if (productionTime >= 0) {
+    productionTime -= 1;
+    final batch = FirebaseFirestore.instance.batch();
+    batch.update(FirebaseFirestore.instance.collection('products').doc(currentid), {'duration': productionTime.toString()});
+    await batch.commit();
+  }
+}
   Future<void> updateSelectedItem(String item) async {
-    //setState(() {
+    if (item == null) {
+      throw ArgumentError('Item cannot be null');
+    }
+    setState(() {
       selecteditem = item;
-    //});
-    await Fbcontroller().canBeProducedByCheckingRequiredMaterials(selecteditem).then((value) => canbebought = value);
-    
+    });
+    try {
+      final canBeProduced = await Fbcontroller().canBeProducedByCheckingRequiredMaterials(selecteditem);
+      setState(() {
+        canbebought = canBeProduced;
+      });
+    } on FirebaseException catch (e) {
+      print('Error checking if product can be produced: $e');
+    } on Exception catch (e) {
+      print('An unexpected error occurred: $e');
+    }
   }
 
   @override
