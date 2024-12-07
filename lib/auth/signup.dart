@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:zelix_empire/firebase/fbcontroller.dart';
-import 'package:zelix_empire/models/building.dart';
-import 'package:zelix_empire/models/product.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

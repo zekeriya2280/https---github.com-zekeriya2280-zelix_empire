@@ -6,6 +6,7 @@ import 'package:zelix_empire/screens.dart/game.dart';
 import 'package:zelix_empire/screens.dart/howtoplay.dart';
 import 'package:zelix_empire/screens.dart/intro.dart';
 import 'package:zelix_empire/screens.dart/options.dart';
+import 'package:zelix_empire/temp/productwatcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,10 @@ void main() async {
       storageBucket: "zelix-empire.appspot.com",
     )
   ); // Firebase'i başlat
+  final watcher = ProductWatcher();
+  await watcher.initialize();
+  watcher.watchFile();
+  print("Ürün izleyici başlatıldı...");
   runApp(const MyApp());
 }
 

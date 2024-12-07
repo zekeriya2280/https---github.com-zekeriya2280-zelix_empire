@@ -62,23 +62,20 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
   Future<void> updateSelectedItem(String item) async {
-    if (item == null) {
-      throw ArgumentError('Item cannot be null');
-    }
+  setState(() {
+    selecteditem = item;
+  });
+
+  try {
+    final canBeProduced = await Fbcontroller().canBeProducedByCheckingRequiredMaterials(selecteditem);
+
     setState(() {
-      selecteditem = item;
+      canbebought = canBeProduced;
     });
-    try {
-      final canBeProduced = await Fbcontroller().canBeProducedByCheckingRequiredMaterials(selecteditem);
-      setState(() {
-        canbebought = canBeProduced;
-      });
-    } on FirebaseException catch (e) {
-      print('Error checking if product can be produced: $e');
-    } on Exception catch (e) {
-      print('An unexpected error occurred: $e');
-    }
+  } catch (e) {
+    print('Error checking if product can be produced: $e');
   }
+}
 
   @override
   Widget build(BuildContext context) {
