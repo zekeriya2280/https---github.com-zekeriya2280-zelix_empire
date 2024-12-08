@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:zelix_empire/auth/login.dart';
 import 'package:zelix_empire/auth/signup.dart';
 import 'package:zelix_empire/screens.dart/game.dart';
@@ -10,20 +13,40 @@ import 'package:zelix_empire/temp/productwatcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyAf1Cu9E4ovFROVxCWi9-7pb44ben58Nys",
-      appId: "1:742305620820:android:7dd78eabb2f5a218eb1ec1",
-      messagingSenderId: "742305620820",
-      projectId: "zelix-empire",
-      storageBucket: "zelix-empire.appspot.com",
-    )
-  ); // Firebase'i başlat
-  final watcher = ProductWatcher();
-  await watcher.initialize();
-  watcher.watchFile();
-  print("Ürün izleyici başlatıldı...");
-  runApp(const MyApp());
+
+  try {
+    print("Initializing Firebase...");
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyAf1Cu9E4ovFROVxCWi9-7pb44ben58Nys",
+        appId: "1:742305620820:android:7dd78eabb2f5a218eb1ec1",
+        messagingSenderId: "742305620820",
+        projectId: "zelix-empire",
+        storageBucket: "zelix-empire.appspot.com",
+      )
+    ); // Firebase'i başlat
+    print("Firebase initialized.");
+    final watcher = ProductWatcher();
+    print("Product watcher created. Initializing...");
+
+    //await watcher.initialize();
+    print("Getting application document directory...");
+    final filePath = await getApplicationDocumentsDirectory().then((value) => '${value.path}/products.json');
+    print("Watching file at $filePath");
+    await watcher.watchFile(filePath);
+    print("Product watcher started.");
+    Timer.periodic(const Duration(seconds: 10), (timer) async {
+      print("Refreshing product watcher...");
+      await watcher.watchFile(filePath);
+      print("Product watcher refreshed.");
+    });
+    print("Running the app...");
+    runApp(const MyApp());
+  } on FirebaseException catch (e) {
+    print('Error initializing Firebase: $e');
+  } on Exception catch (e) {
+    print('An unexpected error occurred: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {

@@ -1,16 +1,8 @@
-import 'package:hive/hive.dart';
-
-@HiveType(typeId: 0)
 class Product2 {
-  @HiveField(0)
   final String name;
-  @HiveField(1)
   final double price;
-  @HiveField(2)
   final int amount;
-  @HiveField(3)
   final String requirements;
-  @HiveField(4)
   final double upkeep;
 
   Product2({

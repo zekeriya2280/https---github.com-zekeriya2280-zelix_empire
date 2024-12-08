@@ -12,19 +12,5 @@
     "amount":15,
     "requirements":"water",
     "upkeep":1000
-},
-"c" : {
-    "name": "gen4",
-    "price":12000,
-    "amount":15,
-    "requirements":"water",
-    "upkeep":1000
-},
-"d" : {
-    "name": "gen5",
-    "price":12000,
-    "amount":15,
-    "requirements":"water",
-    "upkeep":1000
 }
 }
