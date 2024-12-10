@@ -24,17 +24,21 @@ class Product {
   // Enflasyona göre satış fiyatını güncelle
   double get currentSalePrice => baseSalePrice * (1 + demandindex);
 
-  factory Product.fromMap(Map<String, dynamic> material) {
+ factory Product.fromMap(Map<String, dynamic> material) {
+  if (material != null && material.isNotEmpty) {
     return Product(
       name: material['name'],
-      basePurchasePrice: double.parse(material['purchasePrice'].toString()),
-      baseSalePrice: double.parse(material['salePrice'].toString()),
-      duration: int.parse(material['duration'].toString()),
-      requiredMaterials: List<Map<String, dynamic>>.from(material['requiredMaterials']),
-      demandindex: double.parse(material['demandindex'].toString()), 
-      level: int.parse(material['level'].toString()),
+      basePurchasePrice: material['purchasePrice'] != null && material['purchasePrice'].isNotEmpty ? double.parse(material['purchasePrice'].toString()) : 0.0,
+      baseSalePrice: material['salePrice'] != null && material['salePrice'].isNotEmpty ? double.parse(material['salePrice'].toString()) : 0.0,
+      duration: material['duration'] != null ? int.parse(material['duration'].toString()) : 0,
+      requiredMaterials: List<Map<String, dynamic>>.from(material['requiredMaterials'] ?? []),
+      demandindex: material['demandindex'] != null ? double.parse(material['demandindex'].toString()) : 0.0, 
+      level: material['level'] != null ? int.parse(material['level'].toString()) : 0,
     );
+  } else {
+    throw ArgumentError('material cannot be null or empty');
   }
+}
 
   Map<String, dynamic> toMap() {
     return {
