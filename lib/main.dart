@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
   void initState(){
     _syncFirebaseWithJson();
     Future.doWhile(() async {
-      await Future.delayed(Duration(seconds: 3));
+      await Future.delayed(Duration(seconds: 10));
       await _syncFirebaseWithJson();
       return true;
     });
