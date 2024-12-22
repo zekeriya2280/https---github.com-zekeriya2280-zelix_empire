@@ -8,9 +8,10 @@ void main() {
     level: 1,
     productDemands: {},
     warehouse: Warehouse(
-      cityName: "Default City A",
-      initialProducts: {},
-      waitUntilFullSettings: {},
+      cityName: "Default A",
+      level: 1,
+      storedProducts: {},
+      waitUntilFullPerProduct: {},
     ),
   );
 

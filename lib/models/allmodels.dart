@@ -2,16 +2,15 @@
 class Warehouse {
   final String cityName; // Name of the city the warehouse belongs to
   int level; // Warehouse level (1, 2, or 3)
-  Map<String, int> storedProducts; // Products and their stored quantities
-  Map<String, bool> waitUntilFullPerProduct; // Wait Until Full setting per product
+  Map<String, int> storedProducts = {}; // Products and their stored quantities
+  Map<String, bool> waitUntilFullPerProduct = {}; // Wait Until Full setting per product
 
   Warehouse({
     required this.cityName,
     this.level = 1,
-    Map<String, int>? initialProducts,
-    Map<String, bool>? waitUntilFullSettings,
-  })  : storedProducts = initialProducts ?? {},
-        waitUntilFullPerProduct = waitUntilFullSettings ?? {};
+    required Map<String, int>? storedProducts,
+    required Map<String, bool>? waitUntilFullPerProduct,
+  });
 
   /// Gets the maximum capacity for any product based on the warehouse level.
   int get maxCapacityPerProduct {
@@ -60,6 +59,17 @@ class Warehouse {
   void setWaitUntilFull(String product, bool enabled) {
     waitUntilFullPerProduct[product] = enabled;
   }
+
+  factory Warehouse.fromJson(Map<String, dynamic> json) => Warehouse(
+        cityName: json['cityName'],
+        level: json['level'],
+        storedProducts: json['storedProducts'] != null
+            ? Map<String, int>.from(json['storedProducts'])
+            : {},
+        waitUntilFullPerProduct: json['waitUntilFullPerProduct'] != null
+            ? Map<String, bool>.from(json['waitUntilFullPerProduct'])
+            : {},
+      );
 }
 
 /// Represents a city with warehouses and upkeep costs for trucks.
@@ -91,6 +101,12 @@ class City {
       print("City $name upgraded to level $level.");
     }
   }
+  factory City.fromJson(Map<String, dynamic> json) => City(
+        name: json['name'],
+        level: json['level'],
+        productDemands: Map<String, int>.from(json['productDemands']),
+        warehouse: Warehouse.fromJson(json['warehouse']),
+      );
 }
 
 /// Represents a truck for transporting products between cities.
