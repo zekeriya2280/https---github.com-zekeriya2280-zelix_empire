@@ -1,0 +1,2 @@
+C:/FlutterWorks/zelix_empire/android/app/.cxx/Debug/j2u655i5/x86_64/CMakeFiles/edit_cache.dir
+C:/FlutterWorks/zelix_empire/android/app/.cxx/Debug/j2u655i5/x86_64/CMakeFiles/rebuild_cache.dir

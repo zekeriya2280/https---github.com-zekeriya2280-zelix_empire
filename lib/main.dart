@@ -1,69 +1,35 @@
-
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:zelix_empire/auth/login.dart';
-import 'package:zelix_empire/auth/signup.dart';
-import 'package:zelix_empire/screens.dart/game.dart';
-import 'package:zelix_empire/screens.dart/howtoplay.dart';
-import 'package:zelix_empire/screens.dart/intro.dart';
-import 'package:zelix_empire/screens.dart/options.dart';
-import 'package:zelix_empire/temp/productdisplayscreen.dart';
-import 'package:zelix_empire/temp/productsyncmanager.dart';
+import 'package:provider/provider.dart';
+import 'package:zelix_empire/models/allmodels.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  City initialCity = City(
+    name: "Default City A",
+    level: 1,
+    productDemands: {},
+    warehouse: Warehouse(
+      cityName: "Default City A",
+      initialProducts: {},
+      waitUntilFullSettings: {},
+    ),
+  );
 
-  try {
-    print("Initializing Firebase...");
-
-    await Firebase.initializeApp(
-        options: const FirebaseOptions(
-      apiKey: "AIzaSyAf1Cu9E4ovFROVxCWi9-7pb44ben58Nys",
-      appId: "1:742305620820:android:7dd78eabb2f5a218eb1ec1",
-      messagingSenderId: "742305620820",
-      projectId: "zelix-empire",
-      storageBucket: "zelix-empire.appspot.com",
-    )); // Firebase'i başlat
-    print("Firebase initialized.");
-    runApp(const MyApp());
-  } on FirebaseException catch (e) {
-    print('Error initializing Firebase: $e');
-  } on Exception catch (e) {
-    print('An unexpected error occurred: $e');
-  }
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<City>(
+          create: (_) => initialCity,
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
+class MyApp extends StatelessWidget {
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  MyApp();
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Timer periodic = Timer.periodic(const Duration(seconds: 99), (timer) {});
-  @override
-  void initState(){
-    _syncFirebaseWithJson();
-    Future.doWhile(() async {
-      await Future.delayed(Duration(seconds: 10));
-      await _syncFirebaseWithJson();
-      return true;
-    });
-    super.initState();
-  }
-  @override
-  void dispose() {
-    periodic.cancel();
-    super.dispose();
-  }
-  Future<void> _syncFirebaseWithJson() async {
-    final ProductSyncManager productSyncManager = ProductSyncManager();
-    await productSyncManager.syncWithFirebase();
-  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -71,16 +37,66 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/jsondisplay', // Uygulama açıldığında ilk olarak login ekranı
-      routes: {
-        '/jsondisplay': (context) => ProductDisplayScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignUpScreen(),
-        '/intro': (context) => const IntroScreen(),
-        '/game': (context) => const GameScreen(),
-        '/howtoplay': (context) => const HowToPlayScreen(),
-        '/options': (context) => const OptionsScreen(),
-      },
+      home: MyHomePage(),
     );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+
+  MyHomePage();
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  late City _city;
+  late Truck _truck;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _city = Provider.of<City>(context, listen: false);
+      _truck = Truck(
+        id: 1,
+        sourceCity: _city.name,
+        destinationCity: "City B",
+        capacity: 100,
+      );
+      print('Initialized city and truck');
+    } catch (e) {
+      print('Error initializing city and truck: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    try {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Rise of Industry Game'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('City: ${_city.name}'),
+              Text('Level: ${_city.level}'),
+              Text('Product Demands: ${_city.productDemands}'),
+              Text('Warehouse: ${_city.warehouse.storedProducts}'),
+              SizedBox(height: 20),
+              Text('Truck: ${_truck.id}'),
+              Text('Source City: ${_truck.sourceCity}'),
+              Text('Destination City: ${_truck.destinationCity}'),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Error building widget: $e');
+      return Text('Error building widget');
+    }
   }
 }
