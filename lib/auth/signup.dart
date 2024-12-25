@@ -28,7 +28,7 @@ class SignUpScreenState extends State<SignUpScreen> {
           if (user != null) {
             await user.updateDisplayName(nicknameController.text);
             await Fbcontroller().signUpToFirebaseUsers(
-                user.uid, nicknameController.text, emailController.text, {}, {});
+                user.uid, nicknameController.text, emailController.text, {}, {}, {});
             if (mounted) {
               Navigator.pushNamed(context, '/intro');
             }

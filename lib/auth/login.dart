@@ -18,10 +18,13 @@ class LoginScreenState extends State<LoginScreen> {
 
   Future<void> login() async {
     try {
-      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
+      final UserCredential userCredential = await _auth
+          .signInWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text)
+          .catchError((error) {
+        developer.log('Error logging in: ${error.toString()}', name: 'LoginScreen');
+        return null;
+      });
       if (userCredential.user == null) {
         developer.log('Error logging in: User is null', name: 'LoginScreen');
         return;
@@ -48,14 +51,14 @@ class LoginScreenState extends State<LoginScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('An unknown error occurred: $e')),
+            SnackBar(content: Text('An unknown error occurred: ${e.toString()}')),
           );
         }
       }
     } on Exception catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An unknown error occurred: $e')),
+          SnackBar(content: Text('An unknown error occurred: ${e.toString()}')),
         );
       }
     }

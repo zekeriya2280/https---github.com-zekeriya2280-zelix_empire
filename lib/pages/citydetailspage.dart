@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:zelix_empire/models/allmodels.dart';
+import 'package:zelix_empire/models/city.dart';
+import 'package:zelix_empire/models/truck.dart';
 
 class CityDetailsPage extends StatefulWidget {
   final City city;

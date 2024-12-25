@@ -1,9 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:zelix_empire/firebase/fbcontroller.dart';
-import 'package:zelix_empire/models/allmodels.dart';
+import 'package:zelix_empire/models/product.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -97,7 +96,7 @@ class _GameScreenState extends State<GameScreen> {
     ],
   ),
 ),
-      body: StreamBuilder<QuerySnapshot<Object?>>(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance.collection('products').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -112,7 +111,7 @@ class _GameScreenState extends State<GameScreen> {
 
           // Eğer veri başarılı bir şekilde gelmişse, bir GridView'da gösteriyoruz.
           final List<Map<String, dynamic>> materials = snapshot.data!.docs
-              .map((doc) => doc.data() as Map<String, dynamic>)
+              .map((doc) => doc.data())
               .toList();
 
           return GridView.builder(
@@ -198,7 +197,7 @@ class _GameScreenState extends State<GameScreen> {
                           ),
                           Text(
                             'Required Materials: \n ${
-                              material.requiredMaterials!.isEmpty ? 'None' :
+                              material.requiredMaterials.isEmpty ? 'None' :
                               material.requiredMaterials.toString().substring(2,material.requiredMaterials.toString().length-2).split('}').join(' ').split('{').join(' ')}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
