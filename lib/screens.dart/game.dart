@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:zelix_empire/firebase/fbcontroller.dart';
-import 'package:zelix_empire/models/product.dart';
+import 'package:zelix_empire/models/allmodels.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});

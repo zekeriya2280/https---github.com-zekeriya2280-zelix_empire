@@ -5,6 +5,8 @@ import 'package:zelix_empire/models/allmodels.dart';
 void main() {
   City initialCity = City(
     name: "Default City A",
+    price: 100,
+    isThisCityPurchased: false,
     level: 1,
     productDemands: {},
     warehouse: Warehouse(
@@ -12,7 +14,7 @@ void main() {
       level: 1,
       storedProducts: {},
       waitUntilFullPerProduct: {},
-    ),
+    ), 
   );
 
   runApp(
@@ -29,7 +31,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
 
-  MyApp();
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
 
-  MyHomePage();
+  const MyHomePage({super.key});
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -58,8 +60,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    
     try {
       _city = Provider.of<City>(context, listen: false);
+      dispatchTrucks(_city);
+      _city.tryUpgrade();
       _truck = Truck(
         id: 1,
         sourceCity: _city.name,

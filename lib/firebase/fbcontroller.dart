@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:zelix_empire/models/building.dart';
-import 'package:zelix_empire/models/product.dart';
+import 'package:zelix_empire/models/allmodels.dart';
 
 class Fbcontroller {
   Future<void> addProductsToFirestore() async { //DEV. RESET--------------------------
@@ -1072,7 +1071,7 @@ class Fbcontroller {
     }
   }
 
-  Future<void> signUpToFirebaseUsers(String id, String nickname, String email, Map<Building,int> buildings, Map<Product,int> products) async {
+  Future<void> signUpToFirebaseUsers(String id, String nickname, String email, Map<Factory,int> buildings, Map<Product,int> products) async {
   if ([id, nickname, email].any((element) => element.isEmpty)) {
     print('Invalid input: all fields must be non-empty.');
     return;

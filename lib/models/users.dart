@@ -1,5 +1,4 @@
-import 'package:zelix_empire/models/building.dart';
-import 'package:zelix_empire/models/product.dart';
+import 'package:zelix_empire/models/allmodels.dart';
 
 class Users {
   final String id;
@@ -7,7 +6,7 @@ class Users {
   final String email;
   int money = 0;
   List<Product> products = [];
-  List<Building> buildings = [];
+  List<Factory> buildings = [];
 
   Users({required this.id, required this.nickname, required this.email , required this.money, required this.buildings, required this.products});
 
@@ -28,7 +27,7 @@ class Users {
       nickname: material['nickname'],
       email: material['email'],
       money: material['money'],
-      buildings: List<Building>.from(material['buildings']),
+      buildings: List<Factory>.from(material['buildings']),
       products: List<Product>.from(material['products']),
     );
   }
