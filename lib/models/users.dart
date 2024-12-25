@@ -51,7 +51,7 @@ class Users {
       nickname: material['nickname'],
       email: material['email'],
       money: material['money'],
-      factories: List<Factory>.from(material['buildings']),
+      factories: List<Factory>.from(material['factories']),
       products: List<Product>.from(material['products']),
       cities: List<City>.from(material['cities']),
     );
