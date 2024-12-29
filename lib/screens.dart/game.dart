@@ -12,13 +12,12 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  Timer? _timer;
   int usermoney = 0;
-  bool canbebought = false;
+  List<bool> canbebought =
+      List.generate(Fbcontroller().products.length, (_) => false);
   String selecteditem = 'Water';
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
@@ -35,67 +34,93 @@ class _GameScreenState extends State<GameScreen> {
       });
     });
   }
-  void startCountdown(Map<String, dynamic> material) {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async{
-      await fetchProductionTime(material['name']);
-    });
-  }
 
-  Future<void> fetchProductionTime(String materialname) async {
-  String currentid = '1';
-  int productionTime = 0;
-  QuerySnapshot<Map<String, dynamic>> documentSnapshot =
-      await FirebaseFirestore.instance.collection('products').get();
-  for (var doc in documentSnapshot.docs) {
-    if (doc.data()['name'] == materialname) {
-      currentid = doc.id;
-      productionTime = int.tryParse(doc.data()['duration'].toString()) ?? 0;
-      break;
+  void startCountdown(Map<String, dynamic> material) async {
+    try {
+      await fetchProductionTime(material['name']);
+    } on Exception catch (e) {
+      print('startCountdown: $e');
     }
   }
-  if (productionTime >= 0) {
-    productionTime -= 1;
-    final batch = FirebaseFirestore.instance.batch();
-    batch.update(FirebaseFirestore.instance.collection('products').doc(currentid), {'duration': productionTime.toString()});
-    await batch.commit();
+
+// ...
+
+  Future<void> fetchProductionTime(String materialname) async {
+  try {
+    final firestore = FirebaseFirestore.instance;
+
+    final documentSnapshot = await firestore
+        .collection('products')
+        .where('name', isEqualTo: materialname)
+        .limit(1)
+        .get();
+
+    if (documentSnapshot.docs.isEmpty) {
+      print('Material not found');
+      return;
+    }
+
+    final doc = documentSnapshot.docs.first;
+    final currentid = doc.id;
+    final productionTime = int.tryParse(doc['duration'].toString()) ?? 0;
+    print('Production time: $productionTime seconds');
+  } catch (e) {
+    print('An error occurred: $e');
   }
 }
-  Future<void> updateSelectedItem(String item) async {
-  setState(() {
-    selecteditem = item;
-  });
 
-  try {
-    final canBeProduced = await Fbcontroller().canBeProducedByCheckingRequiredMaterials(selecteditem);
+  Future<void> updateSelectedItem(
+      String? item, List<Map<String, dynamic>> materials) async {
+    if (item == null) {
+      print('Item is null');
+      return;
+    }
 
     setState(() {
-      canbebought = canBeProduced;
+      selecteditem = item;
     });
-  } catch (e) {
-    print('Error checking if product can be produced: $e');
-  }
-}
 
+    try {
+      final canBeProduced =
+          await Fbcontroller().canBeProducedByCheckingRequiredMaterials(item);
+
+      setState(() {
+        final index =
+            materials.indexWhere((material) => material['name'] == item);
+        if (index != -1) {
+          canbebought[index] = canBeProduced;
+        } else {
+          print('Material not found in list');
+        }
+      });
+    } on FirebaseException catch (e) {
+      print('Error checking if product can be produced: $e');
+    } on Exception catch (e) {
+      print('An unexpected error occurred: $e');
+    }
+  }
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
+    
     return Scaffold(
       appBar: AppBar(
-  backgroundColor: Color.fromARGB(255, 0, 191, 255), // beautiful blue color
-  elevation: 0,
-  leading: null, // remove back button
-  title: Row(
-    children: [
-      Text(
-        '\$${usermoney.toString()}',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
+        backgroundColor:
+            Color.fromARGB(255, 0, 191, 255), // beautiful blue color
+        elevation: 0,
+        leading: null, // remove back button
+        title: Row(
+          children: [
+            Text(
+              '\$${usermoney.toString()}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
-    ],
-  ),
-),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance.collection('products').snapshots(),
         builder: (context, snapshot) {
@@ -110,9 +135,8 @@ class _GameScreenState extends State<GameScreen> {
           }
 
           // Eğer veri başarılı bir şekilde gelmişse, bir GridView'da gösteriyoruz.
-          final List<Map<String, dynamic>> materials = snapshot.data!.docs
-              .map((doc) => doc.data())
-              .toList();
+          final List<Map<String, dynamic>> materials =
+              snapshot.data!.docs.map((doc) => doc.data()).toList();
 
           return GridView.builder(
             padding: const EdgeInsets.all(10),
@@ -124,18 +148,20 @@ class _GameScreenState extends State<GameScreen> {
               mainAxisExtent: 300,
             ),
             itemCount: materials.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (context, index)  {
               materials.sort((a, b) => a['level'].compareTo(b['level']));
               Product material = Product.fromMap(materials[index]);
-              
               return Card(
-                color: !canbebought ? Colors.redAccent : const Color.fromARGB(255, 255, 255, 255),
+                color: !canbebought[index]
+                    ? Colors.grey
+                    : const Color.fromARGB(255, 255, 255, 255),
                 elevation: 5,
                 child: InkWell(
-                  onTap: () async
-                    {
-                    await updateSelectedItem(material.name);
-                    canbebought ? startCountdown(material.toMap()) : true;
+                  onTap: () async {
+                    await updateSelectedItem(material.name, materials);
+                    canbebought[index]
+                        ? startCountdown(material.toMap())
+                        : true;
                   },
                   child: SizedBox(
                     height: 4000,
@@ -176,7 +202,7 @@ class _GameScreenState extends State<GameScreen> {
                             textAlign: TextAlign.center,
                           ),
                           Text(
-                            'Duration: ${material.duration.toString()}',
+                            'Duration: ${material.duration.toString()} seconds',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
@@ -196,9 +222,7 @@ class _GameScreenState extends State<GameScreen> {
                             textAlign: TextAlign.center,
                           ),
                           Text(
-                            'Required Materials: \n ${
-                              material.requiredMaterials.isEmpty ? 'None' :
-                              material.requiredMaterials.toString().substring(2,material.requiredMaterials.toString().length-2).split('}').join(' ').split('{').join(' ')}',
+                            'Required Materials: \n ${material.requiredMaterials.isEmpty ? 'None' : material.requiredMaterials.toString().substring(2, material.requiredMaterials.toString().length - 2).split('}').join(' ').split('{').join(' ')}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,

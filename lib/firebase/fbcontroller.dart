@@ -5,13 +5,7 @@ import 'package:zelix_empire/models/factory.dart';
 import 'package:zelix_empire/models/product.dart';
 
 class Fbcontroller {
-  Future<void> addProductsToFirestore() async {
-    //DEV. RESET--------------------------
-    // Firestore instance
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    // Ürünlerin JSON formatında listesi
-    List<Map<String, dynamic>> products = [
+  List<Map<String, dynamic>> products = [
       {
         "name": "Iron Ore",
         "level": 1,
@@ -1012,7 +1006,16 @@ class Fbcontroller {
         "inflation": 0
       }
     ];
+  List<Map<String, dynamic>> get allproducts => products;
 
+  Future<void> addProductsToFirestore() async {
+    //DEV. RESET--------------------------
+    // Firestore instance
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // Ürünlerin JSON formatında listesi
+    
+    // Firestore batch işlemi
     // Firestore batch işlemi
     WriteBatch batch = firestore.batch();
 
@@ -1178,6 +1181,8 @@ class Fbcontroller {
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get();
+
+      if (!userDoc.exists) return false;
 
       final userProducts = userDoc.data()?['products'];
 
